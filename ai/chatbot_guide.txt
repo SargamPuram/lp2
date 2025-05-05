@@ -1,0 +1,142 @@
+
+💬 Python Chatbot (GUI + Terminal Fallback) – Ubuntu Guide
+
+✅ Requirements
+-----------------
+
+Ensure the following are installed on Ubuntu:
+
+```bash
+sudo apt update
+sudo apt install python3 python3-pip python3-tk
+pip3 install nltk pillow
+```
+
+If you don't have `sudo` access:
+```bash
+pip3 install --user nltk pillow
+```
+
+🚀 Running the GUI Chatbot
+----------------------------
+
+Save this as `chatbot.py`:
+
+```python
+import nltk
+from nltk.chat.util import Chat, reflections
+from tkinter import Tk, Label, Entry, Button, Text, END
+from PIL import Image, ImageTk
+
+nltk.download('punkt')
+
+pairs = [
+    [r"my name is (.*)", ["Hello %1, how can I help you today?"]],
+    [r"what is your name?", ["I am a chatbot created using Python and NLTK."]],
+    [r"how are you ?", ["I'm doing well, thank you!", "I'm great, thanks for asking!"]],
+    [r"sorry (.*)", ["It's okay, no problem.", "No worries!"]],
+    [r"quit", ["Bye! Take care. See you soon.", "Goodbye! Have a great day!"]],
+    [r"(.*) (help|support) (.*)", ["Sure, I can help you. What do you need assistance with?"]],
+    [r"hi|hey|hello", ["Hello!", "Hey there!", "Hi! How can I assist you?"]],
+    [r"(.*) (weather|temperature) (.*)", ["I'm sorry, I don't have access to real-time weather data."]],
+    [r"(.*) (age|old) (.*)", ["I'm just a program, so I don't have an age!"]],
+    [r"(.*) (thank you|thanks) (.*)", ["You're welcome!", "No problem!", "Glad to help!"]],
+]
+
+chatbot = Chat(pairs, reflections)
+
+def start_chat():
+    def send_message():
+        user_input = entry.get()
+        if user_input.lower() == "quit":
+            chat_window.insert(END, "You: " + user_input + "\n")
+            chat_window.insert(END, "Chatbot: Goodbye!\n")
+            root.quit()
+        else:
+            chat_window.insert(END, "You: " + user_input + "\n")
+            response = chatbot.respond(user_input)
+            chat_window.insert(END, "Chatbot: " + response + "\n")
+            entry.delete(0, END)
+
+    root = Tk()
+    root.title("Chatbot")
+
+    try:
+        image = Image.open("chatbot_image.png")
+        photo = ImageTk.PhotoImage(image)
+        image_label = Label(root, image=photo)
+        image_label.photo = photo
+        image_label.pack()
+    except:
+        pass  # Skip image if not found
+
+    chat_window = Text(root, wrap="word")
+    chat_window.pack(expand=True, fill="both")
+
+    entry = Entry(root, width=50)
+    entry.pack(side="left", expand=True, fill="x")
+    send_button = Button(root, text="Send", command=send_message)
+    send_button.pack(side="right")
+
+    root.mainloop()
+
+if __name__ == "__main__":
+    start_chat()
+```
+
+Run it:
+```bash
+python3 chatbot.py
+```
+
+⚠️ What Can Go Wrong?
+-------------------------
+
+| Issue                            | Solution                                               |
+|----------------------------------|--------------------------------------------------------|
+| `ModuleNotFoundError`            | Install missing packages with `pip3 install`          |
+| `TclError: no display name`      | You're in CLI (no GUI). Use terminal fallback below   |
+| `FileNotFoundError: image.png`   | Add image or skip image-loading part                  |
+| Nothing happens                  | Ensure you're in GUI, not CLI-only (e.g., TTY)        |
+
+🧪 Backup: Terminal-Only Chatbot
+---------------------------------
+
+Save as `chatbot_terminal.py`:
+
+```python
+import nltk
+from nltk.chat.util import Chat, reflections
+
+nltk.download('punkt')
+
+pairs = [
+    [r"my name is (.*)", ["Hello %1, how can I help you today?"]],
+    [r"what is your name?", ["I am a chatbot created using Python and NLTK."]],
+    [r"how are you ?", ["I'm doing well, thank you!"]],
+    [r"quit", ["Goodbye!", "See you later!"]],
+]
+
+chatbot = Chat(pairs, reflections)
+print("Start chatting with the bot (type 'quit' to stop)!")
+chatbot.converse()
+```
+
+Run it:
+```bash
+python3 chatbot_terminal.py
+```
+
+🎓 Viva/Explanation (If Asked)
+-------------------------------
+
+- **What libraries are used?**  
+  NLTK (NLP), Tkinter (GUI), Pillow (images)
+
+- **How does it work?**  
+  Pattern matching with `Chat` and `reflections` from NLTK.
+
+- **Fallbacks?**  
+  If GUI fails, use terminal-based `chatbot_terminal.py`.
+
+✅ Done! Keep this file handy in your Ubuntu lab or upload it to your drive or email.
