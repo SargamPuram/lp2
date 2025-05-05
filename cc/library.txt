@@ -1,0 +1,307 @@
+Mini Project: Simple Inventory Management System using Salesforce Cloud
+1. Setting Up Salesforce Developer Account (if not already done)
+Sign up for a Salesforce Developer Edition at Salesforce Developer Signup.
+
+Once registered, log in to your Salesforce account.
+
+2. Define Your Inventory Management System
+This system will allow you to manage products, track their quantities, and record sales transactions. The application will have the following main components:
+
+Product Management: To create and manage products in the inventory.
+
+Inventory Transactions: To track changes in inventory when products are added or sold.
+
+Reporting: Generate reports on inventory status and sales.
+
+3. Design Custom Objects in Salesforce
+In Salesforce, you need to create Custom Objects to represent your products and transactions.
+
+Step 1: Create Product Object
+Navigate to Setup: Click on the gear icon (top-right) and select Setup.
+
+Search for Object Manager: In the Quick Find box, type Object Manager.
+
+Create Custom Object:
+
+Click on Create -> Custom Object.
+
+Name it Product.
+
+Add necessary fields such as:
+
+Product Name (Text)
+
+SKU (Text)
+
+Description (Long Text)
+
+Quantity in Stock (Number)
+
+Price (Currency)
+
+Step 2: Create Inventory Transaction Object
+In Object Manager, create another custom object called Inventory_Transaction.
+
+Fields you might need:
+
+Transaction Date (Date/Time)
+
+Product (Lookup to Product object)
+
+Quantity Changed (Number)
+
+Transaction Type (Picklist: ‘Sale’, ‘Restock’)
+
+4. Write Apex Code for Business Logic
+Now let’s write some Apex code for handling business logic, such as when products are added or sold.
+
+Step 1: Apex Class to Handle Inventory Updates
+In Apex Classes (Setup -> Apex Classes -> New):
+
+apex
+Copy code
+public class InventoryManagement {
+
+    // Method to restock products
+    public static void restockProduct(Id productId, Integer quantityToRestock) {
+        // Fetch product
+        Product2 product = [SELECT Id, Quantity_in_Stock__c FROM Product2 WHERE Id = :productId LIMIT 1];
+
+        // Update product quantity
+        product.Quantity_in_Stock__c += quantityToRestock;
+
+        // Save changes
+        update product;
+
+        // Log transaction in Inventory_Transaction
+        Inventory_Transaction__c transaction = new Inventory_Transaction__c(
+            Product__c = productId,
+            Quantity_Changed__c = quantityToRestock,
+            Transaction_Type__c = 'Restock',
+            Transaction_Date__c = System.now()
+        );
+        insert transaction;
+    }
+
+    // Method to sell products
+    public static void sellProduct(Id productId, Integer quantityToSell) {
+        // Fetch product
+        Product2 product = [SELECT Id, Quantity_in_Stock__c FROM Product2 WHERE Id = :productId LIMIT 1];
+
+        // Check if enough stock is available
+        if (product.Quantity_in_Stock__c >= quantityToSell) {
+            // Update product quantity
+            product.Quantity_in_Stock__c -= quantityToSell;
+
+            // Save changes
+            update product;
+
+            // Log transaction in Inventory_Transaction
+            Inventory_Transaction__c transaction = new Inventory_Transaction__c(
+                Product__c = productId,
+                Quantity_Changed__c = quantityToSell,
+                Transaction_Type__c = 'Sale',
+                Transaction_Date__c = System.now()
+            );
+            insert transaction;
+        } else {
+            // Handle case where there is not enough stock
+            System.debug('Not enough stock to sell.');
+        }
+    }
+}
+restockProduct: Restocks the inventory by adding stock to the product.
+
+sellProduct: Sells the product by reducing the stock and logging the transaction.
+
+Step 2: Apex Trigger for Automatic Stock Updates (Optional)
+If you want to automatically update inventory when products are added or sold, you can use Apex Triggers.
+
+apex
+Copy code
+trigger ProductTrigger on Product2 (after insert, after update) {
+
+    // Check if product stock was updated
+    for (Product2 prod : Trigger.new) {
+        if (prod.Quantity_in_Stock__c != Trigger.oldMap.get(prod.Id).Quantity_in_Stock__c) {
+            // Log stock update in Inventory_Transaction
+            Inventory_Transaction__c transaction = new Inventory_Transaction__c(
+                Product__c = prod.Id,
+                Quantity_Changed__c = prod.Quantity_in_Stock__c - Trigger.oldMap.get(prod.Id).Quantity_in_Stock__c,
+                Transaction_Type__c = 'Restock',
+                Transaction_Date__c = System.now()
+            );
+            insert transaction;
+        }
+    }
+}
+This Trigger updates the inventory and logs the transaction automatically when product quantities change.
+
+5. Create Reports and Dashboards (Optional)
+Go to Reports in Salesforce and create a new report based on the Product object.
+
+Use filters to display inventory levels and sales statistics.
+
+You can also create a Dashboard to visualize data like:
+
+Total Products in Stock
+
+Total Sales Transactions
+
+Current Stock vs Sold Items
+
+6. Finalizing the App
+Add Custom Pages: In App Builder, create custom pages for:
+
+Viewing inventory
+
+Recording sales and stock updates.
+
+Deploy: Once your application is tested, deploy it to production.
+
+Viva Questions for Inventory Management Project in Salesforce:
+What is the purpose of the Inventory Management System in Salesforce?
+
+It helps manage products, track stock levels, and record transactions like sales and restocks.
+
+Explain the role of Apex in Salesforce applications.
+
+Apex is a programming language used to write business logic, automate processes, and interact with Salesforce data.
+
+What is the difference between a Custom Object and a Standard Object?
+
+A Custom Object is user-defined and allows you to store custom data, whereas a Standard Object is predefined by Salesforce (e.g., Account, Contact).
+
+How does the Inventory_Transaction__c object help in tracking product changes?
+
+The Inventory_Transaction__c object logs all changes in product stock, including both sales and restocks, for better inventory tracking.
+
+What are Governor Limits in Salesforce?
+
+These are limits imposed by Salesforce on the number of database operations, queries, and DML operations that can be executed within a single transaction.
+
+Recap for Exam:
+Create Custom Objects: Define objects for Product and Inventory Transaction.
+
+Write Apex Code: Implement methods for restocking and selling products.
+
+Use Triggers: Automatically log inventory changes.
+
+Generate Reports: Create reports and dashboards to track inventory levels.
+
+This project should give you a complete mini project that you can show and explain during your Salesforce exam.
+
+
+Step-by-Step Guide for Creating Tabs in Salesforce for Inventory Management System
+You can create custom Tabs in Salesforce to allow users to interact with the Product and Inventory Transaction objects.
+
+1. Create Tabs for Custom Objects
+Navigate to Setup: Click the gear icon on the top-right corner of your Salesforce screen and select Setup.
+
+Search for Tabs: In the Quick Find box, type Tabs and click on Tabs under the User Interface section.
+
+Create New Tab:
+
+Click on the New button under the Custom Object Tabs section.
+
+Step 1: Select the Object: Choose Product (or Product2 if that’s what you named it) from the list of Custom Objects.
+
+Step 2: Choose the Tab Style: Select an appropriate tab style icon for your Product object.
+
+Step 3: Name the Tab: Provide a name for your tab, e.g., Inventory Management or Product Catalog.
+
+Click Next.
+
+Assign to Profiles:
+
+Select which profiles should have access to this tab. Typically, all profiles related to the Inventory Management system (like admins, managers, etc.) should have access.
+
+Click Next, and then Save.
+
+Create another Tab for Inventory_Transaction:
+
+Follow the same process to create a tab for the Inventory Transaction object.
+
+Again, name the tab appropriately, such as Inventory Transactions.
+
+This will allow users to navigate directly to the page where inventory transactions are logged.
+
+2. Add Tabs to Salesforce Apps
+After creating the tabs, you can now add them to a Salesforce App for easier navigation.
+
+Navigate to Setup: Go to Setup as mentioned before.
+
+Search for App Manager: In the Quick Find box, search for App Manager and click it.
+
+Edit the App:
+
+If you want to add these tabs to an existing app (like Sales, Service, etc.), find the app and click Edit.
+
+If you want to create a new app specifically for inventory management, click New Lightning App and follow the prompts.
+
+Add the Tabs:
+
+In the app setup, under Navigation Items, click Add More Items.
+
+From the list, select the newly created Product and Inventory Transaction tabs and click Add.
+
+Save: Click Save to finalize adding these tabs to the app.
+
+3. Testing the Tabs
+Go to the App:
+
+Once the tabs are added to your app, go to the app and check the navigation menu.
+
+You should see the Inventory Management tab for the Product object and the Inventory Transactions tab for the Inventory_Transaction object.
+
+Verify Functionality:
+
+Click on the Inventory Management tab to see the product list.
+
+You should be able to create new products, view their details, and update stock levels.
+
+Click on the Inventory Transactions tab to log sales or restock transactions.
+
+4. Customizing Tab Views
+To make it even more intuitive, you can customize the Page Layouts for the tabs to control how the fields are displayed. You can:
+
+Go to Object Manager.
+
+Select the object (like Product or Inventory_Transaction).
+
+Under the Page Layouts section, customize how fields should be displayed for your users.
+
+For example, you can create a custom layout for displaying products with fields like Product Name, Price, and Quantity in Stock in a particular order.
+
+5. Creating Reports and Dashboards with Tabs
+You can create custom reports and dashboards based on the data shown in these tabs.
+
+Reports: Create reports to show products with low stock, high sales, or restocked items.
+
+Dashboards: Add visual elements like pie charts, bar graphs, or line charts to represent the data visually (e.g., total sales over time, products by category).
+
+Viva Questions on Tabs
+What is the purpose of creating custom tabs in Salesforce?
+
+Custom tabs provide quick access to custom objects, enabling users to navigate and interact with data more efficiently.
+
+What types of objects can have custom tabs?
+
+Custom objects, Visualforce pages, Lightning components, and external URLs can have custom tabs in Salesforce.
+
+How do custom tabs enhance the user experience in a Salesforce application?
+
+Custom tabs allow users to quickly access relevant information from different parts of the application, improving the overall workflow and productivity.
+
+What are the steps to add a custom tab to an app in Salesforce?
+
+Create the custom tab under Tabs in Setup, then add it to your app through App Manager under the Navigation Items section.
+
+Recap:
+Created Custom Tabs: For Product and Inventory Transaction.
+
+Added Tabs to Salesforce App: Integrated the tabs into a Salesforce app for better navigation.
+
+Tested the Tabs: Made sure the functionality worked and tabs were accessible for users.
+
+Customized Page Layouts: Enhanced how data is presented on the tabs.

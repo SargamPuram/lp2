@@ -1,0 +1,114 @@
+# ☁️ Google App Engine: Installation & Deployment Guide
+
+## 🔹 What is Google App Engine?
+Google App Engine (GAE) is a **Platform-as-a-Service (PaaS)** by Google Cloud that allows developers to build and deploy applications without managing the underlying infrastructure.
+
+---
+
+## 🐧 For Ubuntu Users
+
+### Step 1: Install Python (if not already installed)
+```bash
+sudo apt update
+sudo apt install python3 python3-pip
+```
+
+### Step 2: Install Google Cloud SDK (CLI)
+```bash
+sudo apt install apt-transport-https ca-certificates gnupg curl
+echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] http://packages.cloud.google.com/apt cloud-sdk main" | sudo tee -a /etc/apt/sources.list.d/google-cloud-sdk.list
+curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key --keyring /usr/share/keyrings/cloud.google.gpg add -
+sudo apt update && sudo apt install google-cloud-sdk
+```
+
+### Step 3: Initialize Google Cloud SDK
+👉 First, navigate to your project directory where your app will be created and deployed.
+
+```bash
+mkdir ~/myapp
+cd ~/myapp
+gcloud init
+```
+
+---
+
+## 🪟 For Windows Users
+
+### Step 1: Download & Install SDK
+- Visit: https://cloud.google.com/sdk/docs/install
+- Download the Windows installer
+- Run and follow the installation prompts
+
+### Step 2: Open SDK Shell and Initialize
+```bash
+gcloud init
+```
+
+---
+
+## 🚀 Deploying a Simple Python App
+
+### Step 1: Create your app directory
+```bash
+mkdir myapp
+cd myapp
+```
+
+### Step 2: Create `main.py`
+```python
+def app(environ, start_response):
+    start_response('200 OK', [('Content-Type', 'text/plain')])
+    return [b'Hello, this is App Engine!']
+```
+
+### Step 3: Create `app.yaml`
+```yaml
+runtime: python39
+entrypoint: gunicorn -b :$PORT main:app
+```
+
+### Step 4: Install Gunicorn
+```bash
+pip install gunicorn
+```
+
+### Step 5: Deploy to App Engine
+```bash
+gcloud app deploy
+```
+
+### Step 6: View your app
+```bash
+gcloud app browse
+```
+
+---
+
+## 🎤 Viva Questions You Might Be Asked
+
+| Question | Answer |
+|---------|--------|
+| What is Google App Engine? | A PaaS that lets you deploy web apps without managing infrastructure. |
+| What language does GAE support? | Python, Java, Go, Node.js, PHP, Ruby and more. |
+| What's the use of `app.yaml`? | It defines your app’s runtime, entrypoint, and other config settings. |
+| What is `gcloud init`? | It authenticates you and sets your project settings. |
+| Can you scale apps in App Engine? | Yes, App Engine automatically scales based on traffic. |
+| How is GAE different from Compute Engine? | GAE is PaaS (no server management); Compute Engine is IaaS (you manage servers). |
+| What are Standard vs Flexible environments? | Standard uses sandboxed runtimes, Flexible gives you more control using Docker. |
+
+---
+
+## 💡 Tip: Always Run `gcloud init` Inside Your Project Directory
+Make sure you run:
+```bash
+gcloud init
+```
+inside the directory where you plan to keep your `main.py` and `app.yaml`. Example:
+```bash
+cd ~/myapp
+gcloud init
+```
+
+---
+
+You're doing great! Take it step-by-step, and don’t stress out. You got this 💪

@@ -1,0 +1,300 @@
+Creating an application in Salesforce.com using Apex Programming Language involves building a custom application on the Salesforce platform. Apex is a strongly typed, object-oriented programming language that runs on the Salesforce platform and allows you to interact with Salesforce data and logic.
+
+Here’s an overview and the steps to create a basic application using Apex:
+
+Steps to Create an Application in Salesforce Using Apex:
+1. Set Up Your Salesforce Developer Account
+Go to Salesforce Developer and sign up for a free developer account.
+
+Once registered, log in to your Salesforce Developer Edition.
+
+2. Create a New Application in Salesforce
+Go to Setup:
+
+In your Salesforce dashboard, click the Gear icon (top-right corner) and select Setup.
+
+Create New App:
+
+In the Quick Find box, type App Manager.
+
+Click on App Manager, then click New Lightning App.
+
+Follow the wizard to define your app's name, logo, and navigation settings. Choose Standard App for a simple layout.
+
+3. Create a Custom Object (Optional but Recommended)
+In Setup, search for Objects in the Quick Find box.
+
+Under Objects and Fields, click Object Manager.
+
+Click Create, then Custom Object.
+
+Fill in the necessary details like the Object Name, Label, and Plural Label. This object will store the data for your application.
+
+4. Write Apex Code
+Apex code is used for backend logic in Salesforce. It can be used for triggers, classes, and web services.
+
+Example of a Simple Apex Class:
+
+Navigate to Apex Classes:
+
+In Setup, search for Apex Classes in the Quick Find box.
+
+Click Apex Classes then click New.
+
+Write Apex Class Code:
+
+Here is a simple example of an Apex class:
+
+apex
+Copy code
+public class AccountHandler {
+
+    // Method to insert an Account
+    public void createAccount(String accountName) {
+        Account newAccount = new Account(Name=accountName);
+        insert newAccount;
+    }
+
+    // Method to update an Account's name
+    public void updateAccountName(Id accountId, String newName) {
+        Account accToUpdate = [SELECT Id, Name FROM Account WHERE Id = :accountId LIMIT 1];
+        accToUpdate.Name = newName;
+        update accToUpdate;
+    }
+
+    // Method to get all Accounts
+    public List<Account> getAllAccounts() {
+        return [SELECT Id, Name FROM Account];
+    }
+}
+Explanation:
+
+The class AccountHandler has three methods:
+
+createAccount: Creates a new Account record.
+
+updateAccountName: Updates an Account record's name based on the provided accountId.
+
+getAllAccounts: Retrieves a list of all Account records.
+
+5. Create Apex Triggers (Optional)
+Apex Triggers are used to automate actions based on changes to Salesforce data (e.g., create, update, delete).
+
+Example of an Apex Trigger:
+
+apex
+Copy code
+trigger AccountTrigger on Account (before insert, before update) {
+    for (Account acc : Trigger.new) {
+        // Example: Automatically set the Account's Name to uppercase before insert or update
+        acc.Name = acc.Name.toUpperCase();
+    }
+}
+This trigger runs before an Account is inserted or updated, and it modifies the Name field by converting it to uppercase.
+
+6. Create Visualforce Page (Optional)
+Visualforce is a framework that allows you to build custom UIs in Salesforce.
+
+Example of a Visualforce Page:
+
+Navigate to Visualforce Pages:
+
+In Setup, search for Visualforce Pages.
+
+Click New to create a new page.
+
+Write the Visualforce Markup:
+
+html
+Copy code
+<apex:page controller="AccountHandler">
+    <apex:form>
+        <apex:pageBlock title="Create New Account">
+            <apex:pageBlockSection>
+                <apex:inputText label="Account Name" value="{!accountName}" />
+            </apex:pageBlockSection>
+            <apex:pageBlockSection>
+                <apex:commandButton value="Create Account" action="{!createAccount}" />
+            </apex:pageBlockSection>
+        </apex:pageBlock>
+    </apex:form>
+</apex:page>
+Explanation:
+
+The Visualforce page is tied to the AccountHandler Apex controller.
+
+Users can input the account name, and upon submitting, the createAccount method from the Apex controller is triggered to create a new Account record.
+
+7. Deploy Your Application
+Once you’ve created your Apex code, triggers, and Visualforce pages, you can deploy them to production via Salesforce’s Deployment tools or Change Sets.
+
+Commands & Tools You Will Use:
+Salesforce Developer Console: For running tests, debugging, and executing Apex code.
+
+Salesforce CLI (Command-Line Interface): For interacting with Salesforce directly from your terminal, allowing you to push and pull code.
+
+To install Salesforce CLI on Ubuntu:
+
+bash
+Copy code
+sudo apt-get install sfdx
+On Windows, download the CLI installer from the Salesforce Developer Website.
+
+8. Testing the Application
+Use the Apex Test Execution feature from Salesforce Setup to run unit tests for your Apex code.
+
+Ensure that your triggers, classes, and Visualforce pages work as expected by running tests directly in the Developer Console or Salesforce CLI.
+
+Viva Questions You Might Be Asked:
+What is Apex?
+
+Apex is a strongly-typed, object-oriented programming language that is used to perform custom business logic on the Salesforce platform.
+
+Explain the difference between Apex Class and Apex Trigger.
+
+Apex Class: Contains reusable methods for custom business logic.
+
+Apex Trigger: Runs automatically when a specific event (insert, update, delete) occurs on a Salesforce object.
+
+What is a Visualforce Page?
+
+Visualforce is a framework that allows developers to create custom user interfaces in Salesforce.
+
+What is the purpose of trigger.new in an Apex Trigger?
+
+trigger.new contains the new values of the records being inserted or updated.
+
+Explain Governor Limits in Salesforce.
+
+Salesforce enforces strict limits on the number of database queries, DML operations, and other system resources a single transaction can use to ensure shared resources are not overwhelmed.
+
+How does Salesforce handle asynchronous operations?
+
+Salesforce provides asynchronous processing using tools like Queueable Apex, Batch Apex, and Future Methods.
+
+What is the role of Salesforce CLI in Apex Development?
+
+Salesforce CLI allows developers to interact with Salesforce directly from the command line, enabling code deployment, testing, and more.
+
+What are the benefits of using Apex over declarative tools in Salesforce?
+
+Apex allows for complex business logic, integrations with external systems, and custom automation that cannot be achieved purely using declarative tools.
+
+
+
+
+
+
+
+
+
+
+
+
+Steps to Create an Application in Salesforce using Apex Programming Language (Simplified)
+1. Set Up Your Salesforce Developer Account (If Not Already Done)
+Visit Salesforce Developer and sign up for a free account.
+
+Once done, log in to the Salesforce Developer Edition.
+
+2. Create a Custom Application in Salesforce
+Go to Setup:
+
+From the Salesforce dashboard, click on the Gear icon (top-right corner) and select Setup.
+
+Create a New App:
+
+In the Quick Find search bar, type App Manager.
+
+Click on App Manager and then click on New Lightning App.
+
+Follow the steps to define the app name, logo, and basic settings.
+
+Add Objects to the App:
+
+In the Object Manager, you can create new custom objects. These will hold your data.
+
+3. Write Your Apex Code
+Apex is the programming language in Salesforce used for business logic. You’ll be mainly working with Apex Classes and Apex Triggers.
+
+Apex Class Example:
+In Setup, search for Apex Classes.
+
+Click New to create a new class.
+
+Simple Apex Class to Insert Account Data:
+
+apex
+Copy code
+public class SimpleAccountCreation {
+
+    // Method to create Account
+    public void createAccount(String accountName) {
+        Account newAccount = new Account(Name = accountName);
+        insert newAccount;
+    }
+}
+Explanation:
+
+This class has a method createAccount, which takes an account name as input, creates a new Account object, and inserts it into the database.
+
+Apex Trigger Example:
+In Setup, search for Apex Triggers.
+
+Click New to create a new trigger.
+
+Trigger to Automatically Convert Account Name to Uppercase:
+
+apex
+Copy code
+trigger AccountNameTrigger on Account (before insert, before update) {
+    for (Account acc : Trigger.new) {
+        acc.Name = acc.Name.toUpperCase();
+    }
+}
+Explanation:
+
+This trigger fires before an account is inserted or updated. It converts the Name field to uppercase.
+
+4. Test Your Apex Code
+You can run tests in the Developer Console in Salesforce.
+
+Go to Setup, search for Apex Test Execution, and click Run Test.
+
+In the Developer Console, you can write test methods to test the functionality of your Apex classes and triggers.
+
+5. Deploy Your Code
+After testing, you can deploy your Apex classes and triggers to production using Change Sets or Salesforce Deployment Tools.
+
+Viva Questions for Salesforce Apex:
+What is Apex in Salesforce?
+
+Apex is Salesforce’s programming language used to write custom business logic and interact with Salesforce data.
+
+What is the difference between an Apex Class and an Apex Trigger?
+
+Apex Class: Contains business logic and methods to perform tasks.
+
+Apex Trigger: Automatically runs based on a specific event, like inserting or updating a record.
+
+What is a Governor Limit in Salesforce?
+
+Salesforce enforces limits to prevent system abuse, such as limits on the number of database queries or DML operations you can execute in a single transaction.
+
+What is the use of the trigger.new context variable?
+
+trigger.new refers to the new values of the records being processed by the trigger.
+
+How do you test your Apex code?
+
+Use Apex Test Execution from Setup or write test methods in your Apex classes to verify the functionality.
+
+Simple Recap for Exams:
+Create Custom Object in Salesforce.
+
+Write Apex Classes for business logic (like inserting accounts).
+
+Write Apex Triggers for actions based on record events (like updating names).
+
+Test and Deploy your code using Salesforce's in-built tools.
+

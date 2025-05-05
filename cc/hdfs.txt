@@ -1,0 +1,203 @@
+This mini-project involves setting up your own cloud for Software as a Service (SaaS) over a Local Area Network (LAN) and using open-source technologies like Hadoop Distributed File System (HDFS) to implement basic cloud operations. The aim is to create a cloud controller that can handle file management (upload, download, segmenting files into blocks) and encryption for security.
+
+Project Overview:
+Set up a cloud environment: The system will simulate a basic cloud storage setup, where files will be uploaded, divided into blocks (similar to HDFS), encrypted, and stored.
+
+Use HDFS for file storage: The file system will use HDFS to store data in a distributed manner across multiple nodes in your LAN.
+
+File encryption: Files will be encrypted before they are uploaded to ensure security.
+
+Operations: Basic operations like file upload, file download, and block segmentation will be implemented.
+
+Detailed Steps for Implementation:
+1. Set up Hadoop and HDFS on your Local Network
+Install Hadoop:
+
+Install Hadoop on multiple machines (or virtual machines) in your lab over the LAN.
+
+For Ubuntu:
+
+bash
+Copy code
+sudo apt update
+sudo apt install openjdk-8-jdk
+wget https://archive.apache.org/dist/hadoop/core/hadoop-3.3.0/hadoop-3.3.0.tar.gz
+tar -xvzf hadoop-3.3.0.tar.gz
+mv hadoop-3.3.0 /usr/local/hadoop
+Configure Hadoop:
+
+Edit the following files:
+
+hadoop-env.sh (set the Java home):
+
+bash
+Copy code
+export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
+core-site.xml (set the Hadoop URI):
+
+xml
+Copy code
+<configuration>
+    <property>
+        <name>fs.defaultFS</name>
+        <value>hdfs://localhost:9000</value>
+    </property>
+</configuration>
+hdfs-site.xml (configure HDFS settings like block size):
+
+xml
+Copy code
+<configuration>
+    <property>
+        <name>dfs.replication</name>
+        <value>1</value>
+    </property>
+    <property>
+        <name>dfs.block.size</name>
+        <value>134217728</value>  <!-- 128MB block size -->
+    </property>
+</configuration>
+Format the NameNode:
+
+bash
+Copy code
+hdfs namenode -format
+Start Hadoop Daemons:
+
+bash
+Copy code
+start-dfs.sh
+2. Setting up the Cloud Controller using Python
+The cloud controller is the core piece that will handle file uploads, block segmentation, encryption, and interaction with HDFS.
+
+Install Required Libraries:
+bash
+Copy code
+pip install pycrypto
+pip install hadoop-api
+Controller Code:
+python
+Copy code
+import os
+import sys
+import hashlib
+from Crypto.Cipher import AES
+from hdfs import InsecureClient
+
+# AES Encryption setup
+def encrypt_file(file_path, key):
+    cipher = AES.new(key, AES.MODE_EAX)
+    with open(file_path, 'rb') as f:
+        file_data = f.read()
+    nonce = cipher.nonce
+    ciphertext, tag = cipher.encrypt_and_digest(file_data)
+    
+    # Write encrypted data to a new file
+    encrypted_file = file_path + ".enc"
+    with open(encrypted_file, 'wb') as f_enc:
+        [f_enc.write(x) for x in (nonce, tag, ciphertext)]
+    return encrypted_file
+
+# HDFS file upload function
+def upload_file_to_hdfs(file_path, hdfs_client, hdfs_path):
+    with open(file_path, 'rb') as file_data:
+        hdfs_client.write(hdfs_path, file_data)
+    print(f"File uploaded to HDFS: {hdfs_path}")
+
+# Function to divide the file into blocks
+def split_file(file_path, block_size=134217728):  # Default to 128MB blocks
+    file_size = os.path.getsize(file_path)
+    blocks = []
+    with open(file_path, 'rb') as f:
+        while (block := f.read(block_size)):
+            blocks.append(block)
+    return blocks
+
+# Function to upload a file in blocks
+def upload_file_in_blocks(file_path, hdfs_client, hdfs_dir):
+    blocks = split_file(file_path)
+    for i, block in enumerate(blocks):
+        block_path = f"{hdfs_dir}/block_{i}"
+        hdfs_client.write(block_path, block)
+        print(f"Block {i} uploaded to HDFS: {block_path}")
+
+# Main function to handle file processing
+def process_file(file_path, hdfs_dir, key):
+    # Encrypt the file
+    encrypted_file = encrypt_file(file_path, key)
+    
+    # Create HDFS client
+    client = InsecureClient('http://localhost:50070')  # HDFS URI
+    
+    # Upload the encrypted file in blocks to HDFS
+    upload_file_in_blocks(encrypted_file, client, hdfs_dir)
+    
+    print(f"File {file_path} processed and uploaded in encrypted form.")
+
+if __name__ == "__main__":
+    if len(sys.argv) != 3:
+        print("Usage: python cloud_controller.py <file_path> <hdfs_dir>")
+        sys.exit(1)
+    
+    file_path = sys.argv[1]
+    hdfs_dir = sys.argv[2]
+    
+    # 32-byte AES encryption key
+    key = hashlib.sha256("secretpassword".encode()).digest()
+    
+    process_file(file_path, hdfs_dir, key)
+Explanation of Code:
+Encrypt File: The file is encrypted using AES encryption before it is uploaded to HDFS. The key used for AES encryption is derived from a password (in this case, "secretpassword").
+
+Split File into Blocks: The file is divided into chunks (blocks), simulating how HDFS splits files into blocks for distributed storage.
+
+Upload to HDFS: Each block is uploaded to the HDFS. We use the InsecureClient from the hdfs Python library to interact with HDFS.
+
+Command-Line Arguments: The script accepts the file path and HDFS directory path as command-line arguments.
+
+3. File Upload and Download
+Upload File:
+To upload a file to your cloud, run the following command in your terminal:
+
+bash
+Copy code
+python cloud_controller.py /path/to/your/file /user/hdfs/cloud_storage
+Download File:
+To download files, you can either write a function in Python or manually interact with HDFS via command line.
+
+For downloading a file from HDFS:
+
+bash
+Copy code
+hadoop fs -get /user/hdfs/cloud_storage/encrypted_file /local/path
+4. Testing the Setup
+Upload a File: Test by uploading any file (e.g., a text or image file).
+
+Verify on HDFS: Check the uploaded blocks in the HDFS directory.
+
+bash
+Copy code
+hadoop fs -ls /user/hdfs/cloud_storage
+Download and Decrypt: If needed, you can also write code to download and decrypt the file.
+
+Viva Questions:
+What is HDFS, and how is it used in your project?
+
+HDFS (Hadoop Distributed File System) is a distributed file system designed to store large files across multiple machines. It divides files into blocks, and the data is replicated across nodes to ensure redundancy. In this project, we use HDFS to store the encrypted file blocks in a distributed manner.
+
+How does file encryption work in your system?
+
+AES encryption is used to secure the files before uploading them to HDFS. The file is read in binary, encrypted using a 256-bit key, and then the encrypted data is uploaded as separate blocks.
+
+How is the file divided into blocks in your system?
+
+The file is read in chunks (blocks) of 128MB by default. Each chunk is then uploaded to HDFS as a separate file.
+
+Why is block-level storage used in HDFS?
+
+Block-level storage allows for efficient distribution of large files across multiple nodes. It enables parallel processing and fault tolerance by replicating blocks across different nodes in the cluster.
+
+How would you handle file decryption?
+
+To decrypt the file, the encrypted blocks would be downloaded from HDFS and combined into the original file. Then, the AES decryption algorithm would be used with the same key to retrieve the original file.
+

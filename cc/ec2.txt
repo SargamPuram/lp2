@@ -1,0 +1,102 @@
+✅ What to Cover in Case Study: Amazon EC2
+📌 What is Amazon EC2?
+Amazon Elastic Compute Cloud (EC2) is a web service that provides resizable compute capacity in the cloud. It allows you to run virtual servers (called instances) for your applications.
+
+🔹 Key Features of EC2
+On-demand compute capacity
+
+Various instance types (General purpose, Compute optimized, Memory optimized, etc.)
+
+Ability to choose OS (Linux, Windows, etc.)
+
+Integration with EBS (storage), VPC (networking), IAM (permissions), etc.
+
+Auto-scaling and Load Balancing
+
+✅ Practical Steps to Launch an EC2 Instance (Free Tier)
+Create AWS Account
+
+Go to https://aws.amazon.com
+
+Sign up and verify credit/debit card
+
+Log in to AWS Management Console
+
+Open EC2 Dashboard
+
+Search EC2 in the services search bar
+
+Click on Launch Instance
+
+Configure Instance
+
+Name: MyEC2Instance
+
+Choose Amazon Machine Image (AMI): Amazon Linux 2 (free tier eligible)
+
+Choose Instance Type: t2.micro (free tier)
+
+Key Pair: Create new key pair (download .pem file)
+
+Network Settings: Default VPC and auto-assign public IP
+
+Storage: Default 8 GB
+
+Click Launch Instance
+
+Access Instance using SSH (from Linux/Ubuntu Terminal)
+
+bash
+Copy code
+chmod 400 your-key.pem
+ssh -i "your-key.pem" ec2-user@<your-public-ip>
+🌐 EC2 Use Case Example
+Use Case: Hosting a static website
+Steps:
+
+Install web server (Apache/Nginx) in your EC2
+
+Upload HTML files via SCP or copy-paste
+
+Open port 80 in the security group
+
+Access via browser using public IP
+
+👍 Advantages of EC2
+Advantage	Description
+Scalability	Easily scale up/down resources
+Pay-as-you-go	Only pay for what you use
+Flexible	Choose OS, instance type, storage
+Reliable	Backed by AWS data centers
+Integrated	Easily connects with other AWS services
+
+👎 Disadvantages of EC2
+Disadvantage	Description
+Learning Curve	Complex for beginners
+Costly at Scale	Non-free tiers can be expensive if not managed
+Management Overhead	You manage OS updates, patches, etc.
+Security	Needs careful IAM and network setup
+
+🎯 What to Submit
+Component	Description
+Case Study PDF/Markdown	Summary of EC2, features, steps, pros/cons
+Screenshot of EC2 Running	Dashboard or SSH login
+Use Case Description	Example like website hosting or Python app
+Optional	Use AWS Academy labs or AWS Educate
+
+🎤 Viva Questions They Might Ask
+Question	Suggested Answer
+What is EC2?	A service for launching virtual servers in the AWS cloud.
+What is AMI?	Amazon Machine Image – a pre-configured OS image.
+What is a security group?	A virtual firewall that controls inbound/outbound traffic.
+Difference between S3 and EC2?	S3 = storage service, EC2 = compute service.
+What is SSH used for?	Securely accessing EC2 instance terminal.
+What’s the free tier limit for EC2?	750 hours/month of t2.micro instance for 12 months.
+What is a key pair?	SSH keys for secure connection to EC2 instances.
+
+📝 Markdown Case Study File (Downloadable)
+Would you like me to export this into a .md (Markdown) or .pdf file you can directly use? I can generate it and offer a backup plain-text version too.
+
+Let me know your preferred format: Markdown / PDF / Plain text?
+
+
